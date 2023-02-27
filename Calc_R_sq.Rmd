@@ -1,0 +1,87 @@
+---
+title: "Calculating R-Squared"
+author: "Anne Beulke"
+output: html_notebook
+---
+# Molecular Ecology
+# Lab 9
+# March 7, 2023
+
+
+Let's input our data
+```{r}
+library(tidyverse)
+
+h_w_data <- read_csv("../../../../Documents/MolecularEcology_Winter_2023/Heritability_Lecture_Lab/fake_h_w_data.csv")
+h_w_data
+```
+```{r}
+mean(h_w_data$weight)
+```
+
+```{r}
+hw <- h_w_data %>% 
+  mutate(res_mean = weight - 53.75) %>% 
+  mutate(res_sq = (res_mean)^2)
+hw
+
+# sum of square around the mean
+sum(hw$res_sq)
+```
+
+```{r}
+# variance around the mean
+var_mean <- sum(hw$res_sq)/length(hw$res_sq)
+# or
+sum(hw$res_sq)/12
+```
+
+```{r}
+hw_reg <- lm(weight ~ height, data = hw)
+summary(hw_reg)
+
+# best fit line, y = 0.298x + 31.8957
+
+```
+
+```{r}
+y_line <- function(x){ 
+  y <- 0.298*x + 31.8957
+  return(y)}
+
+hw_line <- hw %>% 
+  mutate(yline = y_line(height))
+
+hw_line
+```
+
+```{r}
+# sum of square of the fit line
+hw_line2 <- hw_line %>% 
+  mutate(y_res = weight - yline) %>% 
+  mutate(y_res_sq = y_res^2)
+
+```
+
+
+```{r}
+#variance around fit line
+var_fit <- sum(hw_line2$y_res_sq)/length(hw_line2$y_res_sq)
+# or
+sum(hw_line2$y_res_sq)/12
+```
+
+```{r}
+# R squared
+
+# (var(mean) - var(fit))/(var(mean))
+
+# or
+
+# (ss(mean) - ss(fit))/(ss(mean))
+
+R_sq <- (var_mean - var_fit)/var_mean
+R_sq
+
+```
+

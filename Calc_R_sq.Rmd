@@ -7,81 +7,179 @@ output: html_notebook
 # Lab 9
 # March 7, 2023
 
+First, let's install the packages we will need. This only need to be done once on our computer, then everytime after this we can skip this step. 
+```{r}
+install.packages("tidyverse")
+```
 
-Let's input our data
+Now that we downloaded the package, we need to let R know when we want to use the package
 ```{r}
 library(tidyverse)
+```
 
-h_w_data <- read_csv("../../../../Documents/MolecularEcology_Winter_2023/Heritability_Lecture_Lab/fake_h_w_data.csv")
+With the package loaded, the next step is to input our data we want to analyze. 
+Please add the path to the dataset "fake_h_w_data.csv" that you downloaded from Canvas.
+```{r}
+h_w_data <- read_csv("path_to_your_file/goes_here")
+
+# we have now given the dataset the name "h_w_data" 
+```
+
+```{r}
+# we can view the data by giving the cammand for its name:
 h_w_data
-```
-```{r}
-mean(h_w_data$weight)
+
+# take a minute to look a the data set. 
+# What are the different columns in the data? How many rows are in the data?
 ```
 
+Next, let's calculate the mean height and weight in our data. The mean height has been done for you, please add the mean weight. 
 ```{r}
+# mean height
+mean_height <- mean(h_w_data$height)
+mean_height
+
+# mean weight
+mean_weight <- #fill in the equation for mean weight here
+mean_weight
+```
+
+Great! We have now looked at our data and found the mean values.
+
+Next, we are going to plot the data with x = height, y = weight
+We will need to use "ggplot" to make our figures, it is the most user-friendly way to make figures in R
+```{r}
+# first, we tell R what data we are working with, then we tell it what we want to do with that data
+h_w_data %>% 
+  ggplot()+
+  geom_point(aes(x =  , y = ))+ # fill in the column names for the variables we want to plot on the graph
+  ggtitle("Height and Weight")
+```
+
+With this data, we are going to run a linear regression, find the best fit line, and then calulate the R^2 and it's p-value.
+
+Next, we want to find the Sum of Squares around the Mean for weight [aka, SS(mean)]
+```{r}
+# To get the SS(mean), we are going to add a new column to our data that subtracts to the weight of each point by the mean weight (which we just calculated above!)
+# the command "mutate" lets you create a new column in your data
 hw <- h_w_data %>% 
-  mutate(res_mean = weight - 53.75) %>% 
-  mutate(res_sq = (res_mean)^2)
+  mutate(res_mean = weight - mean_weight) %>%  #residuals from the mean
+  mutate(res_sq = (res_mean)^2)               #squared residuals
 hw
 
 # sum of square around the mean
-sum(hw$res_sq)
+sum_mean <- sum(hw$res_sq)
+sum_mean
 ```
 
+Now let's calculate the variance around the mean, Var(mean)
 ```{r}
 # variance around the mean
 var_mean <- sum(hw$res_sq)/length(hw$res_sq)
+var_mean
 # or
 sum(hw$res_sq)/12
 ```
 
+The next step is to find the best fit line for the data. We will do that with a linear regression that uses Least Squares to find the best fit line. 
 ```{r}
-hw_reg <- lm(weight ~ height, data = hw)
-summary(hw_reg)
+# linear regressions are a type of linear model so the command for a linear regression is "lm"
+# the formula for the command is as follows: lm(y_variable ~ x_variable)
+hw_lm <- lm(weight ~ height, data = hw)
 
-# best fit line, y = 0.298x + 31.8957
+summary(hw_lm)
+
+# y = mx + b
+# what is the slope? 
+# What is the y-intercept?
+# write the formula for the best fit line here:
 
 ```
 
+Now we will plot the data with the best fit line
 ```{r}
+# To add the regression line to the plot, we need to add a new ggplot command, which is geom_abline(), we will then tell R the y-intercept and the slope of the line we want to add
+
+hw %>% 
+  ggplot()+
+  geom_point(aes(x = height, y = weight))+
+  geom_abline(intercept = , slope = )+ # add the correct values here
+  ggtitle("Height and Weight, with line of best fit")
+```
+
+Now that we have found the best fit line, we can continue out to calculate the R^2 for the linear regression of height and weight. 
+We will now create a function that easily give us all the values of the best fit line at all the different x values for our data points. We need this information to complete the Sum of Square around the Best Fit Line, SS(fit).
+```{r}
+# I have created a function called "y_line" that returns the y value for points along our best fit line at the x values given into the function. 
 y_line <- function(x){ 
-  y <- 0.298*x + 31.8957
+  y <- <slope>*x + <intercept>  #replace "<slope>" and "<intercept>" with the real values
   return(y)}
 
-hw_line <- hw %>% 
-  mutate(yline = y_line(height))
+hw_fit <- hw %>% 
+  mutate(y_fit = y_line(height)) # here we used to function y_line() to fill in the values for the y_fit column that were created. This will add the y values for the best fit line at each height in our dataset. 
 
-hw_line
+hw_fit # take a look at the y_fit column we created to see if the values make sense, to check that our function worked correctly
 ```
 
+Next, let's get the residuals from our data points to the best fit line. We need this information to cacluate the SS(fit)
 ```{r}
 # sum of square of the fit line
-hw_line2 <- hw_line %>% 
-  mutate(y_res = weight - yline) %>% 
-  mutate(y_res_sq = y_res^2)
+hw_fit2 <- hw_fit %>% 
+  mutate(y_res = weight - y_fit) %>% #residuals from the best fit line
+  mutate(y_res_sq = y_res^2) # squared residuals
+
+# now we can find the SS(fit)
+# add the command below, it will be similar to what you did for the SS(mean)
+
 
 ```
 
 
 ```{r}
-#variance around fit line
-var_fit <- sum(hw_line2$y_res_sq)/length(hw_line2$y_res_sq)
-# or
-sum(hw_line2$y_res_sq)/12
+#variance around fit line, Var(fit)
+#add the command below to find the variance around the best fit line
+
+
 ```
 
+
+We now have all the components to calculate the R^2 for the linear regression of height and weight
 ```{r}
 # R squared
 
-# (var(mean) - var(fit))/(var(mean))
+# (var(mean) - var(fit)) / (var(mean))
 
-# or
-
-# (ss(mean) - ss(fit))/(ss(mean))
-
-R_sq <- (var_mean - var_fit)/var_mean
+# Type the equation for the R^2 with the values you have already computed. 
+R_sq <- #type equation here!
 R_sq
 
 ```
+
+Now that you have the R^2 value, does it match the R^2 value that was given by the "lm" output? Scroll up to your linear regression summary and find out if your calculation was correct! It should match the "Multiple R-squared" value in the output from the "lm" command.
+
+Next we will calculate the F statistic to find the p-value of the R^2. This will tell us if we have enough data points to support the relationship we found between height and weight.
+```{r}
+# F_stat = [(SS(mean) -SS(fit))/(pfit - pmean)]/[SS(fit)/(n - pfit)]
+
+#degrees of freedom
+# pfit is the number of parameters in our best fit line
+# pfit = 
+
+# pmean is the number of parameters in our mean line
+# pmean = 
+
+# n is the number of data points we have
+# n = 
+
+# pfit - pmean = 
+# n - pfit = 
+
+F_stat <- #add equation here
+  
+#Now we will get the p-value tied with the Fstatistics
+
+pf(F_stat, df = 1, df2 = 10, lower.tail = FALSE) #this will tell you the p-value!
+
+```
+
 

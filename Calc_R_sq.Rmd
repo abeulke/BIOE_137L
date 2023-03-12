@@ -7,7 +7,7 @@ output: html_notebook
 # Lab 9
 # March 7, 2023
 
-First, let's install the packages we will need. This only need to be done once on our computer, then everytime after this we can skip this step. 
+First, let's install the packages we will need. This only need to be done once on your computer, then every time after this you can skip this step. 
 ```{r}
 install.packages("tidyverse")
 ```

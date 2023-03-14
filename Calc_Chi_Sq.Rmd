@@ -12,7 +12,7 @@ output: html_notebook
 
 Please submit this assignment on gradescope to gain up to 10 extra credit points! 
 
-First, there is an example populations of moths where the chi-squared calculations have been done for you. Then there is a second population, this time of rabbits, where you can did the calculations yourself. All of the numbered sections are opportunities to earn extra credit points. 
+First, there is an example populations of moths where the chi-squared calculations have been done for you. Then there is a second population, this time of rabbits, where you can do the calculations yourself. All of the numbered sections are opportunities to earn extra credit points. 
 
 So, let's look at the genotypes of some moths and rabbits, find the expected genotypes based on Hardy-Weinberg Equilibrium, and use the Chi-Squared Test to see if the populations are in HWE or not.
 

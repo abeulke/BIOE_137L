@@ -93,11 +93,11 @@ obs_exp
 ```
 
 Now let's plot the observed and expected values for the three genotypes
-2) Edit the graph to make it unique
+2) Edit the graph to make it unique 
 ```{r}
 obs_exp %>% 
   ggplot()+
-  geom_col(aes(x = genotype, y = observations), fill = "blue", alpha = 0.8)+
+  geom_col(aes(x = genotype, y = observations), fill = "blue", alpha = 0.4)+
   geom_col(aes(x = genotype, y = expected), fill = NA, color = "red")+
   ggtitle("observations filled in blue, expected outlined in red")
 ```

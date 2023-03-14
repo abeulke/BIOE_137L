@@ -19,6 +19,7 @@ library(tidyverse)
 
 1. With the package loaded, the next step is to input our data we want to analyze. 
 Please add the path to the dataset "fake_h_w_data.csv" that you downloaded from Canvas.
+Tip: If you create a folder, save the data file in that folder, and save this R notebook in the same folder, you can just type the name of the file in the "" because your file will be within your working directory. If your data file is not in the same folder as this R notebook, you can type the path to the file. 
 ```{r}
 h_w_data <- read_csv("path_to_your_file/goes_here")
 
@@ -36,8 +37,8 @@ h_w_data
 2. Next, let's calculate the mean height and weight in our data. The mean height has been done for you, please add the mean weight. 
 ```{r}
 # mean height
-mean_height <- mean(h_w_data$height)
-mean_height
+mean_height <- mean(h_w_data$height) # the $ is used to tell a function the column you want to use within a data table
+mean_height                         #  data_name$column_name
 
 # mean weight
 mean_weight <- #fill in the equation for mean weight here
@@ -47,47 +48,48 @@ mean_weight
 Great! We have now looked at our data and found the mean values.
 
 3. Next, we are going to plot the data with x = height, y = weight
-We will need to use "ggplot" to make our figures, it is the most user-friendly way to make figures in R
+We will use "ggplot" to make our figures, it is the most user-friendly way to make figures in R
 ```{r}
 # first, we tell R what data we are working with, then we tell it what we want to do with that data
+# %>% this symbol, called "pipe," lets you connect a series of commands, below it is connecting our data frame to ggplot
 h_w_data %>% 
   ggplot()+
   geom_point(aes(x =  , y = ))+ # fill in the column names for the variables we want to plot on the graph
   ggtitle("Height and Weight")
 ```
 
-With this data, we are going to run a linear regression, find the best fit line, and then calulate the R^2 and it's p-value.
+With this data we are going to run a linear regression, find the best fit line, and then calculate the R^2 and it's p-value.
 
 Next, we want to find the Sum of Squares around the Mean for weight [aka, SS(mean)]
 ```{r}
-# To get the SS(mean), we are going to add a new column to our data that subtracts to the weight of each point by the mean weight (which we just calculated above!)
+# To get the SS(mean), we are going to add a new column to our data that subtracts mean weight (which we just calculated above!) from the weight of each point. 
 # the command "mutate" lets you create a new column in your data
 hw <- h_w_data %>% 
-  mutate(res_mean = weight - mean_weight) %>%  #residuals from the mean
-  mutate(res_sq = (res_mean)^2)               #squared residuals
-hw
+  mutate(res_mean = weight - mean_weight) %>%  #"res_mean" is the new column with the residuals from the mean
+  mutate(res_sq = (res_mean)^2)               #"res_sq" is a new column with the squared residuals
+hw #this tells R to show us the new data table we made
 
 # sum of square around the mean
 sum_mean <- sum(hw$res_sq)
-sum_mean
+sum_mean # we now have the sum of square around the mean saved as a variable named "sum_mean"
 ```
 
 Now let's calculate the variance around the mean, Var(mean)
 ```{r}
 # variance around the mean
-var_mean <- sum(hw$res_sq)/length(hw$res_sq)
+var_mean <- sum_mean/length(hw$res_sq) #the length() command will give the length of a column, so the number of rows in a column
 var_mean
 # or
-sum(hw$res_sq)/12
+sum_mean/12  # if you don't want to use the length() command, you can type the number of rows in your data
 ```
 
 The next step is to find the best fit line for the data. We will do that with a linear regression that uses Least Squares to find the best fit line. 
 ```{r}
 # linear regressions are a type of linear model so the command for a linear regression is "lm"
-# the formula for the command is as follows: lm(y_variable ~ x_variable)
+# the formula for the command is as follows: lm(y_variable ~ x_variable, data = name_of_data_here)
 hw_lm <- lm(weight ~ height, data = hw)
 
-summary(hw_lm)
+summary(hw_lm) # the summary command gives you important information about your linear regression
 
 # y = mx + b
 # what is the slope? 
@@ -103,11 +105,11 @@ summary(hw_lm)
 hw %>% 
   ggplot()+
   geom_point(aes(x = height, y = weight))+
-  geom_abline(intercept = , slope = )+ # add the correct values here
+  geom_abline(slope = , intercept = )+ # add the correct values here
   ggtitle("Height and Weight, with line of best fit")
 ```
 
-5. Now that we have found the best fit line, we can continue out to calculate the R^2 for the linear regression of height and weight. We will now create a function that easily give us all the values of the best fit line at all the different x values for our data points. We need this information to complete the Sum of Square around the Best Fit Line, SS(fit).
+5. Now that we have found the best fit line, we can continue to calculate the R^2 for the linear regression of height and weight. We will now create a function that easily give us all the values of the best fit line at all the different x values for our data points. We need this information to complete the Sum of Square around the Best Fit Line, SS(fit).
 ```{r}
 # I have created a function called "y_line" that returns the y value for points along our best fit line at the x values given into the function. 
 y_line <- function(x){ 
@@ -117,18 +119,21 @@ y_line <- function(x){
 hw_fit <- hw %>% 
   mutate(y_fit = y_line(height)) # here we used to function y_line() to fill in the values for the y_fit column that were created. This will add the y values for the best fit line at each height in our dataset. 
 
-hw_fit # take a look at the y_fit column we created to see if the values make sense, to check that our function worked correctly
+hw_fit # take a look at the y_fit column we created to see if the values make sense, to check that our function worked correctly. Compare the values in your hw_fit column to the graph you plotted with the best fit line
 ```
 
-6. Next, let's get the residuals from our data points to the best fit line. We need this information to calculate the SS(fit)
+6. Next, let's get the residuals from our data points to the best fit line. We need this information to calculate the SS(fit). You can do this by following the example I did above with the SS(mean)
 ```{r}
 # sum of square of the fit line
 hw_fit2 <- hw_fit %>% 
   mutate(y_res = weight - y_fit) %>% #residuals from the best fit line
   mutate(y_res_sq = y_res^2) # squared residuals
 
+hw_fit2
+
 # now we can find the SS(fit)
 # add the command below, it will be similar to what you did for the SS(mean)
+
 
 
 ```
@@ -149,6 +154,7 @@ hw_fit2 <- hw_fit %>%
 # (var(mean) - var(fit)) / (var(mean))
 
 # Type the equation for the R^2 with the values you have already computed. 
+
 R_sq <- #type equation here!
 R_sq
 
@@ -174,17 +180,18 @@ R_sq
 # n - pfit = 
 
 F_stat <- #add equation here
-  
+F_stat
+    
 #Now we will get the p-value tied with the F statistic
 
 pf(F_stat, df = 1, df2 = 10, lower.tail = FALSE) #this will tell you the p-value!
 
 ```
 
-Well done!
+Well done! Take a look at the lm output once more. Do your F statistic and p value match the what you calculated? 
 
-11. Now, remake the figure of the data and the best fit line, but this time change the plot in a unique wa that so it is different than your neighbor's graph. You can change the color of the points or line, the shape of the points or the type of line, you can change the background, edit the labels on the axes or the title, and you can change how frequently you have numbers on the axes and the angle of the text! Here is a helpful website that can teach you all about making graphs in R with ggplot. https://r4ds.had.co.nz/data-visualisation.html#data-visualisation
-https://colorpalettes.net/
+
+11. Now, remake the figure of the data and the best fit line, but this time change the plot in a *unique* way so it is different than your neighbor's graph. You can change the color of the points or line, the shape of the points or the type of line, you can change the background, edit the labels on the axes or the title, and you can change how frequently you have numbers on the axes and the angle of the text! Here is a helpful website that can teach you all about making graphs in R with ggplot. https://r4ds.had.co.nz/data-visualisation.html#data-visualisation
 
 ```{r}
 #Below are some ideas, but change it however you want it to be! 
@@ -199,6 +206,8 @@ https://colorpalettes.net/
 
 # Have some fun with it!
 
+
+#First step, replace the ??? with the missing variables, then get creative!
 hw %>% 
   ggplot()+
   geom_point(aes(x =  ??? , y = ????), size = 4, color = "white", fill = "#217074", shape = 23 )+
@@ -214,6 +223,9 @@ hw %>%
 
 
 12. What did you think of this lab? 
+
+
+
 
 
 

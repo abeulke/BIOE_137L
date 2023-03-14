@@ -14,7 +14,7 @@ Please submit this assignment on gradescope to gain up to 10 extra credit points
 
 First, there is an example populations of moths where the chi-squared calculations have been done for you. Then there is a second population, this time of rabbits, where you can did the calculations yourself. All of the numbered sections are opportunities to earn extra credit points. 
 
-So, let's look at the genotypes of some moths and rabbits, find the expected genotypes based on Hardy-Weinberg Equalibrium, and use the Chi-Squared Test to see if the populations are in HWE or not.
+So, let's look at the genotypes of some moths and rabbits, find the expected genotypes based on Hardy-Weinberg Equilibrium, and use the Chi-Squared Test to see if the populations are in HWE or not.
 
 1) Read in the data file for the moths
 ```{r}
@@ -27,8 +27,12 @@ Calculate the observed genotype frequencies
 ```{r}
 # AA frequency
 1469/(1469+138+5)
+#or you could type
+1469/sum(moths$observations)
+
 # Aa Frequency
 138/(1469+138+5)
+
 # aa frequency
 5/(1469+138+5)
 ```
@@ -61,7 +65,7 @@ p^2
 
 q^2
 
-# we will put these value into a vector that we will use later
+# we will put these value to a variable that we will use later
 freq_values <- c(p^2, 2*p*q, q^2)
 freq_values
 ```
@@ -82,26 +86,37 @@ q^2*1612
 Add the expected values to the data table
 ```{r}
 obs_exp <- moths %>% 
-  add_column(expected = c(p^2*1612, 2*p*q*1612, q^2*1612))
+  add_column(expected = c(p^2*1612, 2*p*q*1612, q^2*1612)) # c() lets you type a series of things 
   
 # take a look at the new column
 obs_exp
 ```
 
+Now let's plot the observed and expected values for the three genotypes
+2) Edit the graph to make it unique
+```{r}
+obs_exp %>% 
+  ggplot()+
+  geom_col(aes(x = genotype, y = observations), fill = "blue", alpha = 0.8)+
+  geom_col(aes(x = genotype, y = expected), fill = NA, color = "red")+
+  ggtitle("observations filled in blue, expected outlined in red")
+```
+
+
 Now test if the observed and expected values are significantly different from each other with Chi-Squared Test
 We will first do this by typing out the calculations and then with the function in R
 ```{r}
-# first add a new colum where the observed value is subtracted from the expected
+# first add a new column where the expected value is subtracted from the observed value
 obs_exp %>% 
   mutate(obs_minus_exp = observations - expected)
 
-# then add another colum where the difference is squared
+# then add another column where the difference is squared
 obs_exp %>% 
   mutate(obs_minus_exp = observations - expected) %>% 
   mutate(diff_sq = obs_minus_exp^2)
 
 # and a final column where the squared value is divided by the expected value
-# then add another colum where the difference is squared
+# then add another column where the difference is squared
 calc_chi <- obs_exp %>% 
   mutate(obs_minus_exp = observations - expected) %>% 
   mutate(diff_sq = obs_minus_exp^2) %>% 
@@ -112,11 +127,11 @@ calc_chi
 # now we need to sum the values from that final column to get the chi-squared values
 sum(calc_chi$diff_sq_divided_by_exp)
 
-# N ext let's figure out the degrees of freedom so we can figure out the p-value of our chi-squared test
+# Next let's figure out the degrees of freedom so we can figure out the p-value of our chi-squared test
 # degrees of freedom for chi-sq test = (r-1)(c-1) where r is the number of rows and c is the number of columns
 # (3-1)*(2-1) = 2*1 = 2 degrees of freedom
 ```
-Now let's enter our chi sauared value into this Chi Square calcualter and find the p-value. http://courses.atlas.illinois.edu/spring2016/STAT/STAT200/pchisq.html
+Now let's enter our chi squared value into this online Chi Square calculator and find the p-value. http://courses.atlas.illinois.edu/spring2016/STAT/STAT200/pchisq.html
 
 Chi-squared test through R function:
 ```{r}
@@ -133,41 +148,46 @@ Since our p value is large, we cannot reject the null hypothesis, therefore the 
 
 
 Let's try a second example with rabbits
-2) Read in the data file for the rabbits
-```{r}
-
-```
-3) Calcualte the observed genotype frequencies
+Read in the data file for the rabbits
 ```{r}
 
 ```
 
-4) Calcualte the observed allele frequencies
+3) Calculate the observed genotype frequencies
+```{r}
+
+```
+
+4) Calculate the observed allele frequencies
 ```{r}
 
 
 ```
 
-5) Calcualte the expected geneotype frequencies
+5) Calculate the expected genotype frequencies
 ```{r}
 
 ```
 
-6) Calcualte the expected genotype occurances with a population of 8070
+6) Calculate the expected genotype occurrences with a population of 8070 and add them to the data table
 ```{r}
 
 ```
 
-7) Calculate the chi-squared value by creating new data columns, like how it was done for the moths
+7) Now let's plot the observed and expected values for the three genotypes (make it unique! so I know it was your work!)
 ```{r}
 
 ```
 
-8) Find the p-value online and type it here:
+8) Calculate the chi-squared value by creating new data columns, like how it was done for the moths
+```{r}
 
-9) Is the population in HWE?
+```
 
-10) Calculate the chi-sqaured value with R
+9) Find the p-value online and type it here:
+Is the population in HWE?
+
+10) Calculate the chi-squared value with R
 ```{r}
 
 ```

@@ -105,6 +105,9 @@ obs_exp %>%
 
 Now test if the observed and expected values are significantly different from each other with Chi-Squared Test
 We will first do this by typing out the calculations and then with the function in R
+The Chi-Sq equation is as follows:
+
+Chi-Squared = Sum( (observed-expected)^2 / expected )
 ```{r}
 # first add a new column where the expected value is subtracted from the observed value
 obs_exp %>% 
